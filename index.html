@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Automate</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 20px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: none; /* Esconde o círculo na primeira etapa */
+        }
+
+        .progress-container svg {
+            transform: rotate(-90deg);
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-container circle {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+        }
+
+        .progress-container .bg {
+            stroke: #f3f3f3;
+        }
+
+        .progress-container .progress {
+            stroke: #3498db;
+            stroke-dasharray: 314.16; /* Circunferência do círculo (2 * PI * raio) */
+            stroke-dashoffset: 314.16; /* Começa vazio */
+            transition: stroke-dashoffset 1s linear; /* Preenchimento contínuo */
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555555;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        .success {
+            color: #2ecc71;
+        }
+
+        .info {
+            color: #3498db;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            let currentMessage = "Solicitação iniciada !<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!";
+            let isProcessing = false; // Status para saber se estamos processando
+            let timeLeft = 8; // Tempo de contagem (em segundos)
+
+            // Função para atualizar o texto com base no status
+            function updateMessage(message, isProcessingState = false) {
+                document.querySelector('.message').innerHTML = message;
+                document.querySelector('.progress-container').style.display = isProcessingState ? 'block' : 'none';
+            }
+
+            // Função para atualizar o progresso do círculo
+            function updateProgress(timeLeft) {
+                const progressCircle = document.querySelector('.progress');
+                const progressText = document.querySelector('.progress-text');
+                const progress = (timeLeft / 20) * 314.16; // Calcula o progresso
+                progressCircle.style.strokeDashoffset = progress; // Atualiza o círculo
+                progressText.textContent = timeLeft;
+            }   
+
+            // Função para fechar a janela após o tempo
+            function closeWindow() {
+                window.close(); // Fecha a janela
+            }
+
+            // Primeira etapa: Apenas a mensagem sem o círculo ou a contagem regressiva
+            updateMessage("Solicitação iniciada !<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!");
+
+            // Chamada à API
+            fetch('https://prod-16.brazilsouth.logic.azure.com/workflows/5a96ea8a9ebd4540a8004dd4fc7d3324/triggers/manual/paths/invoke?api-version=2016-06-01&sp=/triggers/manual/run&sv=1.0&sig=gzBHUddVIAUHEBDsLdj-ixUhZdQcxAg127o6NFLRXes', {
+                method: 'GET',
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    // Quando a API retornar sucesso
+                    currentMessage = "Solicitação processada com sucesso !!!<br>O conjunto de dados está sendo atualizado, aguarde alguns minutos para a conclusão da atualização e atualize a página!";
+                    isProcessing = true; // Começar o processo
+                    updateMessage(currentMessage, isProcessing);
+
+                    // Começar o cronômetro de 20 segundos para atualizar o progresso
+                    const timer = setInterval(() => {
+                        if (timeLeft > 0) {
+                            timeLeft--;
+                            updateProgress(timeLeft);
+                            // Atualiza a mensagem com a contagem regressiva
+                            document.querySelector('.footer').textContent = `Esta página será fechada em ${timeLeft} segundos.`;
+                        } else {
+                            clearInterval(timer);
+                            document.querySelector('.footer').textContent = "Você pensou, o RPA ja fez :D";
+                            setTimeout(closeWindow, 2000); // Fecha a janela após 2 segundos
+                        }
+                    }, 1000);
+
+                } else {
+                    // Se a requisição falhar
+                    currentMessage = "Solicitação encontrou um erro!<br>Por favor informe ao Departamento de TI via GLPI.<br><a href='https://helpdesk.montana.com.br/front/helpdesk.public.php?create_ticket=1' target='_blank'>Clique aqui para abrir um ticket</a>";
+                    updateMessage(currentMessage);
+                    document.querySelector('.message').classList.add('error');
+                }
+            })
+            .catch(error => {
+                // Caso haja erro na requisição
+                console.error('Erro na requisição:', error);
+                currentMessage = "Solicitação encontrou um erro!<br>Por favor informe ao Departamento de TI via GLPI.<br><a href='https://helpdesk.montana.com.br/front/helpdesk.public.php?create_ticket=1' target='_blank'>Clique aqui para abrir um ticket</a>";
+                updateMessage(currentMessage);
+                document.querySelector('.message').classList.add('error');
+            });
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Exibe logo do Power Automate com tamanho maior -->
+        <div class="logo">
+            <img src="image.png" alt="Power Automate Logo" width="200"> <!-- Logo maior -->
+        </div>
+        <div class="message">
+            Solicitação iniciada !<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!
+        </div>
+        <div class="progress-container">
+            <svg>
+                <circle class="bg" cx="60" cy="60" r="50"></circle>
+                <circle class="progress" cx="60" cy="60" r="50"></circle>
+            </svg>
+            <div class="progress-text"></div>
+        </div>
+        <div class="footer"></div> <!-- A mensagem de contagem regressiva não será exibida inicialmente -->
+    </div>
+</body>
+</html>
