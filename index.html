@@ -97,7 +97,7 @@
         window.onload = function() {
             let currentMessage = "Solicitação iniciada !<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!";
             let isProcessing = false;
-            let timeLeft = 600; // 10 minutos em segundos
+            let timeLeft = 600;
 
             function updateMessage(message, isProcessingState = false) {
                 document.querySelector('.message').innerHTML = message;
@@ -107,7 +107,7 @@
             function updateProgress(timeLeft) {
                 const progressCircle = document.querySelector('.progress');
                 const progressText = document.querySelector('.progress-text');
-                const progress = (timeLeft / 600) * 314.16;
+                const progress = (timeLeft / 20) * 314.16;
                 progressCircle.style.strokeDashoffset = progress;
                 progressText.textContent = timeLeft;
             }
@@ -131,7 +131,7 @@
                         if (timeLeft > 0) {
                             timeLeft--;
                             updateProgress(timeLeft);
-                            document.querySelector('.footer').textContent = `Esta página será fechada em ${timeLeft} segundos.`;
+                            document.querySelector('.footer').textContent = Esta página será fechada em ${timeLeft} segundos.;
                         } else {
                             clearInterval(timer);
                             document.querySelector('.footer').textContent = "Você pensou, o RPA já fez :D";
@@ -139,7 +139,7 @@
                         }
                     }, 1000);
                 } else {
-                    throw new Error(`Erro na solicitação: ${response.status}`);
+                    throw new Error(Erro na solicitação: ${response.status});
                 }
             })
             .catch(error => {
