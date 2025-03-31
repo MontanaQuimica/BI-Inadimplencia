@@ -95,19 +95,18 @@
     </style>
     <script>
         window.onload = function() {
-            let currentMessage = "Solicitação iniciada !<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!";
-            let isProcessing = false;
-            let timeLeft = 8;
+            let currentMessage = "Solicitação iniciada!<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!";
+            let timeLeft = 600; // 10 minutos
 
-            function updateMessage(message, isProcessingState = false) {
+            function updateMessage(message, showProgress = false) {
                 document.querySelector('.message').innerHTML = message;
-                document.querySelector('.progress-container').style.display = isProcessingState ? 'block' : 'none';
+                document.querySelector('.progress-container').style.display = showProgress ? 'block' : 'none';
             }
 
-            function updateProgress(timeLeft) {
+            function updateProgress() {
                 const progressCircle = document.querySelector('.progress');
                 const progressText = document.querySelector('.progress-text');
-                const progress = (timeLeft / 20) * 314.16;
+                const progress = (timeLeft / 600) * 314.16;
                 progressCircle.style.strokeDashoffset = progress;
                 progressText.textContent = timeLeft;
             }
@@ -123,15 +122,14 @@
             })
             .then(response => {
                 if (response.ok) {
-                    currentMessage = "Solicitação processada com sucesso !!!<br>O conjunto de dados está sendo atualizado, aguarde alguns minutos para a conclusão da atualização e atualize a página!";
-                    isProcessing = true;
-                    updateMessage(currentMessage, isProcessing);
-
+                    currentMessage = "Solicitação processada com sucesso!!!<br>O conjunto de dados está sendo atualizado, aguarde alguns minutos para a conclusão da atualização e atualize a página!";
+                    updateMessage(currentMessage, true);
+                    
                     const timer = setInterval(() => {
                         if (timeLeft > 0) {
                             timeLeft--;
-                            updateProgress(timeLeft);
-                            document.querySelector('.footer').textContent = Esta página será fechada em ${timeLeft} segundos.;
+                            updateProgress();
+                            document.querySelector('.footer').textContent = `Esta página será fechada em ${timeLeft} segundos.`;
                         } else {
                             clearInterval(timer);
                             document.querySelector('.footer').textContent = "Você pensou, o RPA já fez :D";
@@ -139,7 +137,7 @@
                         }
                     }, 1000);
                 } else {
-                    throw new Error(Erro na solicitação: ${response.status});
+                    throw new Error(`Erro na solicitação: ${response.status}`);
                 }
             })
             .catch(error => {
