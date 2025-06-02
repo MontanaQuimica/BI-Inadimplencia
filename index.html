@@ -123,8 +123,8 @@
             updateMessage("Solicitação iniciada !<br>Estamos obtendo os dados para realizar a atualização, por favor aguarde!");
 
             // Chamada à API
-            fetch('https://prod-14.brazilsouth.logic.azure.com/workflows/0a9e227859a741e39819c0e0dfedf7ce/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ahu2aRuRNDEqWqo7udFp8PxVth_MLxSw-IvQaGExlq4', {
-                method: 'GET',
+            fetch('https://prod-14.brazilsouth.logic.azure.com:443/workflows/0a9e227859a741e39819c0e0dfedf7ce/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ahu2aRuRNDEqWqo7udFp8PxVth_MLxSw-IvQaGExlq4', {
+                method: 'POST',
             })
             .then(response => {
                 if (response.status === 200) {
